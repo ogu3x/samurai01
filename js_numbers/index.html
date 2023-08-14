@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .num {
+        width: 40px;
+        height: 40px;
+        border: 1px solid blue;
+      }
+      .disable {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <audio id="btn_success">
+      <source src="./決定ボタンを押す12.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="btn_mistake">
+      <source src="./ビープ音4.mp3" type="audio/mp3" />
+    </audio>
+    <div id="timer"></div>
+    <div id="start">[START]</div>
+    <div id="parent" style="display: flex"></div>
+
+    <script>
+      const btnsuccess = document.getElementById("btn_success");
+      const btnmistake = document.getElementById("btn_mistake");
+      // 成功した回数
+      let countSuccess = 0;
+      // 失敗した回数
+      let countFail = 0;
+      //ゲーム時間（秒）
+      let second = 15;
+      // スタートボタン
+      let btnStart = document.getElementById("start");
+      btnStart.addEventListener("click", startGame, false);
+
+      /*
+       * function
+       */
+      function main() {
+        let parent = document.getElementById("parent");
+        let rand = get_randoms(6);
+        let min_idx = check_min(rand);
+
+        // 子要素があれば全て削除
+        while (parent.firstChild) {
+          parent.removeChild(parent.firstChild);
+        }
+        // 乱数の数だけ、子要素を生成、イベントを割り当てる
+        let num = 0;
+        rand.forEach(function (val) {
+          let new_div = document.createElement("div");
+          new_div.classList.add("num");
+          if (num == min_idx) {
+            new_div.addEventListener("click", success, false);
+          } else {
+            new_div.addEventListener("click", fail, false);
+          }
+          new_div.textContent = val;
+          parent.appendChild(new_div);
+          num++;
+        });
+      }
+
+      // ゲーム開始イベント
+      function startGame() {
+        // STARTボタンを無効化
+        btnStart.classList.add("disable");
+        // カウンターリセット
+        countSuccess = 0;
+        countFail = 0;
+        main();
+        startTimer(second);
+      }
+
+      // 成功イベント
+      function success() {
+        btnsuccess.currentTime = 0;
+        btnsuccess.play();
+        countSuccess++;
+        main();
+      }
+      // 失敗イベント
+      function fail() {
+        btnmistake.currentTime = 0;
+        btnmistake.play();
+        countFail++;
+      }
+      // 乱数生成
+      function get_random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      // 乱数の配列生成
+      function get_randoms(count) {
+        let array = [];
+        while (array.length < count) {
+          let r = get_random(0, 10);
+          if (array.indexOf(r) == -1) {
+            array.push(r);
+          }
+        }
+        return array;
+      }
+      // 最小値のインデックス番号を返す
+      function check_min(numbers) {
+        //あり得ない大きな数字をセットしておく
+        let ini_num = 1000;
+        let ini_index = 0;
+        let n = 0;
+        numbers.forEach(function (num) {
+          if (ini_num > num) {
+            ini_num = num;
+            ini_index = n;
+          }
+          n++;
+        });
+        return ini_index;
+      }
+      //エンディング
+      function ending() {
+        alert("Success:" + countSuccess + "\nFail:" + countFail);
+        // STARTボタンを有効
+        btnStart.classList.remove("disable");
+      }
+      //カウントダウンタイマー
+      function startTimer(second) {
+        let idTimer = setInterval(count_down, 1000);
+        function count_down() {
+          let e = document.getElementById("timer");
+          second--;
+          e.textContent = second;
+          if (second <= 0) {
+            clearInterval(idTimer);
+            document.body.style.backgroundColor = "#ffffff";
+            ending();
+          } else if (second < 3) {
+            document.body.style.backgroundColor = "#ff8888";
+          } else if (second < 6) {
+            document.body.style.backgroundColor = "#ffdddd";
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
