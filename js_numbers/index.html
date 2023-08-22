@@ -51,18 +51,16 @@
           parent.removeChild(parent.firstChild);
         }
         // 乱数の数だけ、子要素を生成、イベントを割り当てる
-        let num = 0;
-        rand.forEach(function (val) {
+        rand.forEach(function (val, index) {
           let new_div = document.createElement("div");
           new_div.classList.add("num");
-          if (num == min_idx) {
+          if (index == min_idx) {
             new_div.addEventListener("click", success, false);
           } else {
             new_div.addEventListener("click", fail, false);
           }
           new_div.textContent = val;
           parent.appendChild(new_div);
-          num++;
         });
       }
 
@@ -110,13 +108,11 @@
         //あり得ない大きな数字をセットしておく
         let ini_num = 1000;
         let ini_index = 0;
-        let n = 0;
-        numbers.forEach(function (num) {
+        numbers.forEach(function (num, index) {
           if (ini_num > num) {
             ini_num = num;
-            ini_index = n;
+            ini_index = index;
           }
-          n++;
         });
         return ini_index;
       }
